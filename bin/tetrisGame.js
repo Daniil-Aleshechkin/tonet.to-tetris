@@ -8,6 +8,28 @@ const textures = {"I": PIXI.Texture.from("/assets/blocks/I.png"),
                 "Z": PIXI.Texture.from("/assets/blocks/Z.png"),
                 "N": PIXI.Texture.from("/assets/blocks/N.png")}
 const app = new PIXI.Application({width: 300, height: 600})
+const pieceStartLoc = {2:4,3:3,4:3}
+const pieces = {"O":[[["O","O"],
+                    ["O","O"]]],
+                "I":[[["I","I","I","I"],
+                    ["","","",""],
+                    ["","","",""],
+                    ["","","",""]]],
+                "Z":[[["Z","Z",""],
+                    ["","Z","Z"],
+                    ["","",""]]],
+                "S":[[["","S","S"],
+                    ["S","S",""],
+                    ["","",""]]],
+                "T":[[["","T",""],
+                    ["T","T","T"],
+                    ["","",""]]],
+                "L":[[["","","L"],
+                    ["L","L","L"],
+                    ["","",""]]],
+                "J":[[["J","",""],
+                    ["J","J","J"],
+                    ["","",""]]]}
 //Loaded board state
 const boardState = [["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
@@ -43,6 +65,15 @@ for (i = 0; i<20;i++){
         gameRow.push(block);
     }
     gameBoard.push(gameRow);
+}
+
+let piece = "I"//Render the Piece
+//Initialize Piece
+for(i=0;i<pieces[piece][0].length;i++){
+    for(j=0;j<pieces[piece][0].length;j++){
+        console.log(i,)
+        gameBoard[i][pieceStartLoc[pieces[piece][0].length]+j].texture = textures[pieces[piece][0][i][j]];
+    }
 }
 
 document.body.appendChild(app.view);
