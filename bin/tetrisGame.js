@@ -164,25 +164,27 @@ const boardState = [["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
-                    ["N","N","N","I","N","I","N","N","N","N"],
-                    ["N","N","N","N","N","N","N","N","N","N"],
-                    ["N","N","N","N","O","N","N","N","N","N"],
-                    ["N","N","N","N","N","N","N","N","N","N"],
-                    ["N","N","Z","N","N","N","Z","N","N","N"],
-                    ["N","N","N","Z","Z","Z","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
-                    ["N","N","L","N","N","N","N","N","N","N"],
-                    ["L","L","L","Z","N","S","S","N","N","J"],
-                    ["O","O","Z","Z","S","S","N","N","N","J"],
-                    ["O","O","Z","I","I","I","I","N","J","J"]]
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","N","N","J"],
+                    ["O","O","O","O","N","N","O","O","O","O"],
+                    ["O","O","O","O","N","N","O","O","O","O"]]
 
 //Initialize Board
 let gameBoard = [];
 
+gameBoard.push(["W","N","N","N","N","N","N","N","N","N","N","W"])
 for (i = 0; i<20;i++){
     let gameRow = [];
+    gameRow.push("W")
     for (j = 0;j<10;j++) {
         let block = new PIXI.Sprite(textures[boardState[i][j]])
         block.x = j*30
@@ -190,13 +192,29 @@ for (i = 0; i<20;i++){
         app.stage.addChild(block);
         gameRow.push(block);
     }
+    gameRow.push("W")
     gameBoard.push(gameRow);
 }
+gameBoard.push(["W","W","W","W","W","W","W","W","W","W","W","W"])
+
 let piecesLoc = [];
 let piecePos = null;
 let pieceRotation = 0;
 let pieceValue = "";
 
+//https://stackoverflow.com/questions/19543514/check-whether-an-array-exists-in-an-array-of-arrays
+function searchForArray(haystack, needle){
+    var i, j, current;
+    for(i = 0; i < haystack.length; ++i){
+      if(needle.length === haystack[i].length){
+        current = haystack[i];
+        for(j = 0; j < needle.length && needle[j] === current[j]; ++j);
+        if(j === needle.length)
+          return i;
+      }
+    }
+    return -1;
+  }  
 //Delete current piece in board
 function deletePiece(){
     if (piecesLoc!=[]){
@@ -212,12 +230,25 @@ function deletePiece(){
 //piece : string -> Piece to be initilized
 //rotation : int -> Rotation to render the piece in
 function renderPiece(x,y,piece,rotation){
-    if(piecesLoc!=[]) {
-        deletePiece();
-    }
+    //Check if the piece can render
     for(i=0;i<pieces[piece][0].length;i++){
         for(j=0;j<pieces[piece][0].length;j++){
             if(pieces[piece][rotation][i][j]!="N"){
+                if(searchForArray(piecesLoc,[i+y,x+j])!=-1||gameBoard[i+y][j+x]=="N") {
+                    continue
+                } else if (gameBoard[i+y][j+x]=="W"||gameBoard[i+y][j+x].texture!=textures["N"]) {
+                    return false;
+                }
+                    
+            }
+        }
+    }
+    //Delete old piece
+    deletePiece();
+    //Render the piece
+    for(i=0;i<pieces[piece][0].length;i++){
+        for(j=0;j<pieces[piece][0].length;j++){
+            if(pieces[piece][rotation][i][j]!="N"&&gameBoard[i+y][j+x]!="W"&&gameBoard[i+y][j+x]!="N"){
                 piecesLoc.push([i+y,j+x]);
                 gameBoard[i+y][j+x].texture = textures[pieces[piece][rotation][i][j]];
             }
@@ -226,7 +257,10 @@ function renderPiece(x,y,piece,rotation){
     pieceRotation = rotation;
     pieceValue = piece;
     piecePos = [x,y];
+    console.log(piecePos)
+    return true;
 }
+
 //Rotate the current piece
 //rotation : int -> value to rotate the piece by with 1 being 90°, 2 being 180°, and 3 being 270°
 function rotatePiece(rotation){
@@ -246,13 +280,52 @@ function movePieceLeft() {
 }
 function movePieceDown() {
     if (piecePos != null) {
-        renderPiece(piecePos[0],piecePos[1]+1,pieceValue,pieceRotation)
+        return renderPiece(piecePos[0],piecePos[1]+1,pieceValue,pieceRotation)
     }
 
 }
+//Initialize the piece
+//piece : string -> Piece to initialize
 function initializePiece(piece) {
-    const pieceStartLoc = {2:4,3:3,4:3}
+    const pieceStartLoc = {2:5,3:4,4:4}
     renderPiece(pieceStartLoc[pieces[piece][0].length],0,piece,0)
 }
+function softDrop() {
+    while (movePieceDown()){}
+}
+function hardDrop() {
+    softDrop();
+    placePiece();
+}
+function placePiece() {
+    //Check the lines that the piece is placed for cleared lines
+    console.log(piecePos)
+    for(i=piecePos[1];i<pieces[pieceValue][0].length+piecePos[1];i++) {
+        isClearedLine = true;
+        for(j=1;j<=10;j++) {
+            if (gameBoard[i][j].texture==textures["N"]) {
+                isClearedLine = false
+                break
+            }
+        }
+        //Clear the line
+        if(isClearedLine) {
+            for(line=i;line>=1;line--) {
+                for(j=1;j<=10;j++) {
+                    if(line==1) {
+                        gameBoard[line][j].texture = textures["N"]
+                    } else {
+                        gameBoard[line][j].texture = textures[gameBoard[line-1][j].texture.baseTexture.cacheId[15]]//Very jank solution potentially need another
+                    }
+                }
+            }
+        }
+    }
+    piecePos = null;
+    pieceValue = "";
+    pieceRotation = 0;
+    piecesLoc = [];
+}
+
 
 document.body.appendChild(app.view);
