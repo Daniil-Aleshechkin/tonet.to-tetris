@@ -8,7 +8,6 @@ const textures = {"I": PIXI.Texture.from("/assets/blocks/I.png"),
                 "Z": PIXI.Texture.from("/assets/blocks/Z.png"),
                 "N": PIXI.Texture.from("/assets/blocks/N.png")}
 const app = new PIXI.Application({width: 300, height: 600})
-const pieceStartLoc = {2:4,3:3,4:3} //X location on rendered piece based on the size of the piece array
 //Piece definitions including rotations
 const pieces = {"O":[[
                         ["O","O"],
@@ -193,44 +192,67 @@ for (i = 0; i<20;i++){
     }
     gameBoard.push(gameRow);
 }
-let pieceLoc = [];
+let piecesLoc = [];
+let piecePos = null;
 let pieceRotation = 0;
 let pieceValue = "";
 
 //Delete current piece in board
 function deletePiece(){
-    if (pieceLoc!=[]){
-        pieceLoc.forEach(loc =>{
+    if (piecesLoc!=[]){
+        piecesLoc.forEach(loc =>{
             gameBoard[loc[0]][loc[1]].texture = textures["N"];
         })
-        pieceLoc = [];
+        piecesLoc = [];
     }
 }
 //Initialize Piece
+//x : int -> x location to render the piece in
+//y : int -> y location to render the piece in
 //piece : string -> Piece to be initilized
 //rotation : int -> Rotation to render the piece in
-function renderPiece(piece,rotation){
-    if(pieceLoc!=[]) {
+function renderPiece(x,y,piece,rotation){
+    if(piecesLoc!=[]) {
         deletePiece();
     }
     for(i=0;i<pieces[piece][0].length;i++){
         for(j=0;j<pieces[piece][0].length;j++){
             if(pieces[piece][rotation][i][j]!="N"){
-                pieceLoc.push([i,j+pieceStartLoc[pieces[piece][rotation].length]]);
+                piecesLoc.push([i+y,j+x]);
+                gameBoard[i+y][j+x].texture = textures[pieces[piece][rotation][i][j]];
             }
-            gameBoard[i][pieceStartLoc[pieces[piece][rotation].length]+j].texture = textures[pieces[piece][rotation][i][j]];
         }
     }
     pieceRotation = rotation;
     pieceValue = piece;
+    piecePos = [x,y];
 }
 //Rotate the current piece
 //rotation : int -> value to rotate the piece by with 1 being 90°, 2 being 180°, and 3 being 270°
 function rotatePiece(rotation){
-    if(pieceLoc!=[]) {
-        deletePiece();
-        renderPiece(pieceValue,(rotation+pieceRotation)%4);
+    if(piecePos != null) {
+        renderPiece(piecePos[0],piecePos[1],pieceValue,(rotation+pieceRotation)%4);
     }
+}
+function movePieceRight() {
+    if (piecePos != null) {
+        renderPiece(piecePos[0]+1,piecePos[1],pieceValue,pieceRotation)
+    }
+}
+function movePieceLeft() {
+    if (piecePos != null) {
+        renderPiece(piecePos[0]-1,piecePos[1],pieceValue,pieceRotation)
+    }
+}
+function movePieceDown() {
+    if (piecePos != null) {
+        renderPiece(piecePos[0],piecePos[1]+1,pieceValue,pieceRotation)
+    }
+
+}
+function initializePiece(piece) {
+    const pieceStartLoc = {2:4,3:3,4:3}
+    renderPiece(pieceStartLoc[pieces[piece][0].length],0,piece,0)
 }
 
 document.body.appendChild(app.view);

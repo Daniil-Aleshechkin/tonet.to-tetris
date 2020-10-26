@@ -9,9 +9,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
     <script type="text/javascript" src="../bin/tetrisGame.js"></script>
     <input type="text" id = "piece">
-    <button onclick="renderPiece(document.getElementById('piece').value,0)">Render Piece</button>
+    <button onclick="initializePiece(document.getElementById('piece').value)">Render Piece</button>
     <button onclick="rotatePiece(3)">Rotate Counterclockwise</button>
     <button onclick="rotatePiece(1)">Rotate Clockwise</button>
     <button onclick="rotatePiece(2)">Rotate 180</button>
+    <button onclick="movePieceLeft()">Move Left</button>
+    <button onclick="movePieceRight()">Move Right</button>
+    <button onclick="movePieceDown()">Move Down</button>
 </body>
 </html>
