@@ -10,8 +10,22 @@ const textures = {"I": PIXI.Texture.from("/assets/blocks/I.png"),
 const app = new PIXI.Application({width: 300, height: 600})
 const pieceStartLoc = {2:4,3:3,4:3} //X location on rendered piece based on the size of the piece array
 //Piece definitions including rotations
-const pieces = {"O":[[["O","O"],
-                    ["O","O"]]],
+const pieces = {"O":[[
+                        ["O","O"],
+                        ["O","O"]
+                    ],
+                    [
+                        ["O","O"],
+                        ["O","O"]
+                    ],
+                    [
+                        ["O","O"],
+                        ["O","O"]
+                    ],
+                    [
+                        ["O","O"],
+                        ["O","O"]
+                    ]],
                 
                 "I":[[
                         ["N","N","N","N"],
