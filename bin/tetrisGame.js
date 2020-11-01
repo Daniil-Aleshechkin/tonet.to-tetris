@@ -175,8 +175,8 @@ const boardState = [["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","N"],
                     ["N","N","N","N","N","N","N","N","N","J"],
-                    ["O","O","O","O","N","N","O","O","O","O"],
-                    ["O","O","O","O","N","N","O","O","O","O"]]
+                    ["N","N","N","N","N","N","N","N","N","N"],
+                    ["N","N","N","N","N","N","N","O","N","N"]]
 
 //Initialize Board
 let gameBoard = [];
@@ -300,9 +300,13 @@ function hardDrop() {
 function placePiece() {
     //Check the lines that the piece is placed for cleared lines
     console.log(piecePos)
-    for(i=piecePos[1];i<pieces[pieceValue][0].length+piecePos[1];i++) {
+    for(let i=piecePos[1];i<pieces[pieceValue][0].length+piecePos[1];i++) {
         isClearedLine = true;
-        for(j=1;j<=10;j++) {
+        if (i>=21) {
+            break;
+        }
+
+        for(let j=1;j<=10;j++) {
             if (gameBoard[i][j].texture==textures["N"]) {
                 isClearedLine = false
                 break
@@ -310,8 +314,8 @@ function placePiece() {
         }
         //Clear the line
         if(isClearedLine) {
-            for(line=i;line>=1;line--) {
-                for(j=1;j<=10;j++) {
+            for(let line=i;line>=1;line--) {
+                for(let j=1;j<=10;j++) {
                     if(line==1) {
                         gameBoard[line][j].texture = textures["N"]
                     } else {
