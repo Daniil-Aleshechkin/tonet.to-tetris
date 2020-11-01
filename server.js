@@ -4,6 +4,7 @@ const port = 5000;
 
 app.set("view engine","ejs");
 app.use("/bin",express.static("bin"));
+app.use("/assets",express.static("assets"));
 
 app.get("/", (req,res) => {
     res.render("index")

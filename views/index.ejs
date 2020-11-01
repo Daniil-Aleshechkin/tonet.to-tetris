@@ -3,21 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <link rel="stylesheet" href="./assets/styles.css">
+    <title>Tonet.to</title>
 </head>
+
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
-    <script type="text/javascript">
-        let app = new PIXI.Application({width: 256, height: 256});
-        document.body.appendChild(app.view);
-        let type = "WebGl";
-        if(!PIXI.utils.isWebGLSupported()) {
-            type = "canvas";
-        }
+<!--Home button -->
+<div class="Navbar">
+    <div class="Title">Home</div>
+    <a class="butLink" href="#">Home</a>
+</div>
 
-        PIXI.utils.sayHello(type);
-    </script>
+<!-- Button for the game page -->
+<div class="Navbar">
+    <div class="Title">Tonet.to</div>
+    <a class="butLink" href="#"></a>
+</div>
 
+<!-- Dropdown for leaderboards-->
+<div class="dropdown">
+    <div class="dropbtn">Leaderboards</div>
+    <div class="dropdown-content">
+        <a href="#">Highscores</a>
+        <a href="#">Top Rated Edits</a>
+        <a href="#"></a>
+    </div>
+</div>
+<h1>This is a homepage. Notice, that it is barren! </h1>
     
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+<script type="text/javascript">
+    let app = new PIXI.Application({width: 256, height: 256});
+    document.body.appendChild(app.view);
+    let type = "WebGl";
+    if(!PIXI.utils.isWebGLSupported()) {
+        type = "canvas";
+    }
+
+    PIXI.utils.sayHello(type);
+</script>    
 </body>
 </html>
