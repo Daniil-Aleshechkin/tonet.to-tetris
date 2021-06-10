@@ -331,8 +331,10 @@ function hardDrop() {
   placePiece();
 }
 function placePiece() {
+  if (!piecePos) {
+    return;
+  }
   //Check the lines that the piece is placed for cleared lines
-  console.log(piecePos);
   for (
     let i = piecePos[1];
     i < pieces[pieceValue][0].length + piecePos[1];
@@ -368,32 +370,63 @@ function placePiece() {
   pieceRotation = 0;
   piecesLoc = [];
 }
+
+//Initialize keys
+let keys = {};
+let keysDiv = document.querySelector("#keys");
+
 function keysDown(e) {
   console.log(e.keyCode);
 
-  if (e.keyCode == 68) {
+  keys[e.keyCode] = true;
+}
+function keysUp(e) {
+  console.log("UP");
+  keys[e.keyCode] = false;
+}
+let tick = 0;
+let dasTime = 0;
+let movements = {"rotate90":false,"rotate180":false,"rotate270":false,""}
+//Loop for DAS and ARR
+function gameLoop() {
+  keysDiv.innerHTML = JSON.stringify(keys);
+
+  if (keys["68"]) {
     hardDrop();
   }
-  if (e.keyCode == 87) {
+  if (keys["87"]) {
     rotatePiece(3);
   }
-  if (e.keyCode == 81) {
+  if (keys["81"]) {
     rotatePiece(2);
   }
-  if (e.keyCode == 37) {
-    movePieceLeft();
+  if (keys["37"]) {
+    if (dasTime == 0) {
+      movePieceLeft();
+    } else {
+      dasTime += 1;
+      if (dasTime > 100) {
+        movePieceLeft();
+      }
+    }
+  } else {
+    dasTime = 0;
   }
-  if (e.keyCode == 39) {
+  if (keys["39"]) {
     movePieceRight();
   }
-  if (e.keyCode == 40) {
+  if (keys["40"]) {
     softDrop();
   }
-  if (e.keyCode == 38) {
+  if (keys["38"]) {
     rotatePiece(1);
   }
+  tick += 1;
 }
 
+app.ticker.add(gameLoop);
+
 window.addEventListener("keydown", keysDown);
+window.addEventListener("keyup", keysUp);
 
 document.body.appendChild(app.view);
