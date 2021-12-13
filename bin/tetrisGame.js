@@ -193,9 +193,9 @@ const boardState = [
   ["N", "N", "N", "N", "N", "N", "N", "N", "N", "N"],
   ["N", "N", "N", "N", "N", "N", "N", "N", "N", "N"],
   ["N", "N", "N", "N", "N", "N", "N", "N", "N", "N"],
-  ["N", "N", "N", "N", "N", "N", "N", "N", "N", "J"],
   ["N", "N", "N", "N", "N", "N", "N", "N", "N", "N"],
-  ["N", "N", "N", "N", "N", "N", "N", "O", "N", "N"],
+  ["N", "N", "N", "N", "N", "N", "N", "N", "N", "N"],
+  ["N", "N", "N", "N", "N", "N", "N", "N", "N", "N"],
 ];
 
 //Initialize Board
@@ -243,6 +243,26 @@ function deletePiece() {
     piecesLoc = [];
   }
 }
+
+function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+  
+    // While there remain elements to shuffle...
+    while (currentIndex != 0) {
+  
+      // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+  
+      // And swap it with the current element.
+      [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
+    }
+  
+    return array;
+  }
+  
+
 //Initialize Piece
 //x : int -> x location to render the piece in
 //y : int -> y location to render the piece in
@@ -286,7 +306,6 @@ function renderPiece(x, y, piece, rotation) {
   pieceRotation = rotation;
   pieceValue = piece;
   piecePos = [x, y];
-  console.log(piecePos);
   return true;
 }
 
@@ -326,9 +345,21 @@ function initializePiece(piece) {
 function softDrop() {
   while (movePieceDown()) {}
 }
+
+let avaiablePieces = ["O","T","I","S","Z","J","L"]
+let bag = [...shuffle(avaiablePieces)]
+initializePiece(bag[0])
+bag.shift()
+
 function hardDrop() {
-  softDrop();
-  placePiece();
+    softDrop();
+    placePiece();
+    if (bag.length == 0) {
+        bag = [...shuffle(avaiablePieces)];
+    }
+    
+    initializePiece(bag[0])
+    bag.shift()
 }
 function placePiece() {
   if (!piecePos) {
@@ -374,53 +405,81 @@ function placePiece() {
 //Initialize keys
 let keys = {};
 let keysDiv = document.querySelector("#keys");
+let gameFocused = true;
 
 function keysDown(e) {
-  console.log(e.keyCode);
-
-  keys[e.keyCode] = true;
+if (gameFocused){
+    keys[e.keyCode] = true;
+    e.preventDefault();
+}
 }
 function keysUp(e) {
-  console.log("UP");
   keys[e.keyCode] = false;
+  if (e.keyCode==39) {
+      dasTime = 0
+  }
+  if (e.keyCode==37) {
+      dasTime = 0
+  }
+  if (e.keyCode==68) {
+      movements["harddrop"] = false
+  }
+  if (e.keyCode==87) {
+      movements["rotate270"] = false
+  }
+  if (e.keyCode==81) {
+      movements["rotate180"] = false
+  }
+  if (e.keyCode==38) {
+      movements["rotate90"] = false
+  }
 }
 let tick = 0;
 let dasTime = 0;
-let movements = {"rotate90":false,"rotate180":false,"rotate270":false,""}
+let movements = {"harddrop":false ,"rotate90":false,"rotate180":false,"rotate270":false}
 //Loop for DAS and ARR
 function gameLoop() {
   keysDiv.innerHTML = JSON.stringify(keys);
 
-  if (keys["68"]) {
+  if (keys["68"] && !movements["harddrop"]) {
     hardDrop();
+    movements["harddrop"]=true
   }
-  if (keys["87"]) {
+  if (keys["87"] && !movements["rotate270"]) {
     rotatePiece(3);
+    movements["rotate270"]=true
   }
-  if (keys["81"]) {
+  if (keys["81"] && !movements["rotate180"]) {
     rotatePiece(2);
+    movements["rotate180"]=true
   }
   if (keys["37"]) {
     if (dasTime == 0) {
       movePieceLeft();
+      dasTime = new Date().getTime(); 
     } else {
-      dasTime += 1;
-      if (dasTime > 100) {
+      if (new Date().getTime()-dasTime >=90) {
         movePieceLeft();
       }
     }
-  } else {
-    dasTime = 0;
   }
   if (keys["39"]) {
-    movePieceRight();
-  }
+    if (dasTime == 0) {
+        movePieceRight();
+        dasTime = new Date().getTime(); 
+      } else {
+        if (new Date().getTime()-dasTime >=90) {
+          movePieceRight();
+        }
+      }
+    }
   if (keys["40"]) {
     softDrop();
   }
-  if (keys["38"]) {
+  if (keys["38"] && !movements["rotate90"]) {
     rotatePiece(1);
-  }
+    movements["rotate90"]=true
+ }
   tick += 1;
 }
 
@@ -429,4 +488,7 @@ app.ticker.add(gameLoop);
 window.addEventListener("keydown", keysDown);
 window.addEventListener("keyup", keysUp);
 
+document.getElementById("piece").addEventListener("click", e => gameFocused=false)
+
+app.view.addEventListener("click",e => gameFocused=true)
 document.body.appendChild(app.view);
